@@ -3,73 +3,318 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Dashboard</title>
+    <title>APEX - Message Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --neon-purple: #bc13fe;
-            --dark-bg: #0a0a0a;
-            --card-bg: rgba(20, 20, 20, 0.8);
-            --text-color: #ffffff;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Space Mono', monospace; 
+            background: linear-gradient(135deg, #0a0015 0%, #1a0033 50%, #0f001f 100%);
+            color: #00ff88;
+            line-height: 1.6;
+            min-height: 100vh;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: var(--dark-bg); color: var(--text-color);
-            min-height: 100vh; display: flex; flex-direction: column;
-            align-items: center; padding: 40px 20px; position: relative;
+        h1, h2, h3, h4, h5, h6 { font-family: 'Orbitron', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
+        .hero {
+            position: relative;
+            padding: 60px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(138, 43, 226, 0.3) 0%, rgba(75, 0, 130, 0.2) 100%);
+            border-bottom: 3px solid #a020f0;
+            box-shadow: 0 0 30px rgba(160, 32, 240, 0.5), inset 0 0 30px rgba(160, 32, 240, 0.1);
         }
-        #scramble-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; opacity: 0.1; font-size: 14px; line-height: 1;
-            word-break: break-all; pointer-events: none; color: var(--neon-purple);
+        .hero h1 {
+            font-size: 3.5rem;
+            color: #ff00ff;
+            text-shadow: 0 0 20px #ff00ff, 0 0 40px #a020f0;
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite;
         }
-        h1 {
-            color: var(--neon-purple); text-shadow: 0 0 15px var(--neon-purple);
-            font-size: 2.5rem; text-transform: uppercase; letter-spacing: 4px;
-            margin-bottom: 10px; text-align: center;
+        @keyframes glow { 0%, 100% { text-shadow: 0 0 20px #ff00ff, 0 0 40px #a020f0; } 50% { text-shadow: 0 0 30px #ff00ff, 0 0 60px #a020f0, 0 0 80px #7b0dd4; } }
+        .hero p { font-size: 1.1rem; color: #00ff88; text-shadow: 0 0 10px #00ff88; }
+        .container { display: flex; min-height: calc(100vh - 200px); }
+        .sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, rgba(20, 0, 40, 0.9) 0%, rgba(30, 0, 60, 0.9) 100%);
+            border-right: 2px solid #a020f0;
+            padding: 30px;
+            overflow-y: auto;
+            box-shadow: inset -10px 0 30px rgba(160, 32, 240, 0.2);
         }
-        .subtitle { font-style: italic; opacity: 0.8; margin-bottom: 50px; }
-        #messages-container { width: 100%; max-width: 800px; display: grid; gap: 25px; }
+        .sidebar h2 { font-size: 1.3rem; color: #ff00ff; margin-bottom: 10px; text-shadow: 0 0 10px #ff00ff; }
+        .sidebar-subtitle { font-size: 0.8rem; color: #00ff88; margin-bottom: 25px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.9rem; font-weight: 700; color: #00ff88; margin-bottom: 8px; text-shadow: 0 0 5px #00ff88; }
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #a020f0;
+            border-radius: 5px;
+            color: #00ff88;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: #ff00ff;
+            box-shadow: 0 0 15px #ff00ff, inset 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+        .stats-box {
+            background: rgba(160, 32, 240, 0.1);
+            border: 2px solid #a020f0;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(160, 32, 240, 0.3);
+        }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; margin-bottom: 8px; }
+        .stat-row:last-child { margin-bottom: 0; }
+        .stat-label { color: #00ff88; }
+        .stat-value { font-weight: 700; color: #ff00ff; text-shadow: 0 0 10px #ff00ff; }
+        .reset-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #a020f0, #7b0dd4);
+            border: 2px solid #ff00ff;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+        }
+        .reset-btn:hover { box-shadow: 0 0 25px rgba(255, 0, 255, 0.8), inset 0 0 15px rgba(255, 0, 255, 0.3); }
+        .reset-btn.hidden { display: none; }
+        .sidebar-info { border-top: 2px solid #a020f0; padding-top: 15px; font-size: 0.75rem; color: #00ff88; line-height: 1.6; }
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; background: linear-gradient(135deg, rgba(10, 0, 21, 0.8) 0%, rgba(26, 0, 51, 0.8) 100%); }
+        .timeline-header { margin-bottom: 30px; }
+        .timeline-header h2 { font-size: 2rem; color: #ff00ff; text-shadow: 0 0 15px #ff00ff; margin-bottom: 8px; }
+        .timeline-header p { font-size: 0.9rem; color: #00ff88; }
+        .empty-state { text-align: center; padding: 80px 20px; }
+        .empty-state p { font-size: 1.2rem; color: #00ff88; margin-bottom: 10px; text-shadow: 0 0 10px #00ff88; }
+        .empty-state p.subtitle { font-size: 0.9rem; color: #a020f0; }
+        .timeline { position: relative; }
         .message-card {
-            background: var(--card-bg); border: 1px solid var(--neon-purple);
-            border-radius: 10px; padding: 25px; position: relative;
-            box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
+            position: relative;
+            padding-left: 30px;
+            padding-bottom: 30px;
+            animation: slideIn 0.6s ease-out;
         }
-        .sender-name { color: var(--neon-purple); font-weight: bold; margin-bottom: 10px; }
-        .message-text { font-size: 1.1rem; line-height: 1.6; color: #e0e0e0; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        .message-card::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 10px;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #ff00ff, #a020f0, transparent);
+            box-shadow: 0 0 10px #ff00ff;
+        }
+        .message-card::after {
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: 10px;
+            width: 16px;
+            height: 16px;
+            background: #ff00ff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #ff00ff, inset 0 0 10px rgba(255, 0, 255, 0.5);
+        }
+        .message-content {
+            background: linear-gradient(135deg, rgba(160, 32, 240, 0.15) 0%, rgba(75, 0, 130, 0.15) 100%);
+            border: 2px solid #a020f0;
+            border-radius: 8px;
+            padding: 18px;
+            box-shadow: 0 0 20px rgba(160, 32, 240, 0.3), inset 0 0 15px rgba(255, 0, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        .message-card:hover .message-content {
+            border-color: #ff00ff;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.6), inset 0 0 20px rgba(255, 0, 255, 0.1);
+            transform: translateY(-3px);
+        }
+        .message-header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 12px; justify-content: space-between; }
+        .message-tags { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .name-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(255, 0, 255, 0.2);
+            color: #ff00ff;
+            border: 1px solid #ff00ff;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-shadow: 0 0 5px #ff00ff;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+        }
+        .time-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(160, 32, 240, 0.4);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: 'Space Mono', monospace;
+            text-shadow: 0 0 5px #00ff88;
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+        }
+        .message-date { font-size: 0.75rem; color: #a020f0; font-family: 'Space Mono', monospace; text-shadow: 0 0 5px #a020f0; }
+        .message-body { font-size: 0.95rem; color: #ffffff; line-height: 1.6; word-break: break-word; }
+        .message-body.empty { font-size: 0.8rem; color: #a020f0; font-style: italic; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 2px solid #a020f0; }
+            .main-content { padding: 20px; }
+            .hero h1 { font-size: 2rem; }
+            .message-header { flex-direction: column; align-items: flex-start; }
+        }
     </style>
 </head>
 <body>
-    <div id="scramble-bg"></div>
-    <h1>Apex Intelligence</h1>
-    <p class="subtitle">Apex, here are your anonymous messages 😂🫣</p>
-    <div id="messages-container">Loading...</div>
+    <div class="hero">
+        <h1>⚡ APEX ⚡</h1>
+        <p>Anonymous Message Hub - Real-time Feed</p>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <h2>⚙️ Control</h2>
+            <p class="sidebar-subtitle" id="filterCount">Loading...</p>
+            <div class="form-group">
+                <label for="searchInput">🔍 Search Messages</label>
+                <input type="text" id="searchInput" placeholder="Find message...">
+            </div>
+            <div class="form-group">
+                <label for="filterInput">👤 Filter by Sender</label>
+                <input type="text" id="filterInput" placeholder="Enter name...">
+            </div>
+            <div class="form-group">
+                <label for="sortSelect">📊 Sort By</label>
+                <select id="sortSelect">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="name">By Name (A-Z)</option>
+                </select>
+            </div>
+            <div class="stats-box">
+                <div class="stat-row">
+                    <span class="stat-label">Showing:</span>
+                    <span class="stat-value" id="showingCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total:</span>
+                    <span class="stat-value" id="totalCount">0</span>
+                </div>
+            </div>
+            <button class="reset-btn hidden" id="resetBtn">🔄 Clear Filters</button>
+            <div class="sidebar-info">
+                <p>💡 Use search to find messages by content, or filter by sender name.</p>
+            </div>
+        </div>
+        <div class="main-content">
+            <div id="content">
+                <div class="empty-state">
+                    <p>⏳ Loading messages...</p>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
-        const bg = document.getElementById('scramble-bg');
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?";
-        function generateScramble() {
-            let str = "";
-            for(let i=0; i<2000; i++) str += chars.charAt(Math.floor(Math.random() * chars.length));
-            bg.innerText = str;
+        const allData = [
+            {"timestamp": "1/1/2026 10:30:15", "name": "Anonymous", "message": "This is a great platform!"},
+            {"timestamp": "1/1/2026 11:45:22", "name": "Anonymous", "message": "Love the vibe here"},
+            {"timestamp": "1/1/2026 12:15:08", "name": "User123", "message": "Amazing experience so far"},
+            {"timestamp": "1/1/2026 13:20:45", "name": "Anonymous", "message": "Keep up the good work"},
+            {"timestamp": "1/1/2026 14:30:12", "name": "Apex_User", "message": "This is incredible!"},
+            {"timestamp": "1/1/2026 15:45:33", "name": "Anonymous", "message": "Best platform ever"},
+            {"timestamp": "1/1/2026 16:10:50", "name": "Developer", "message": "Great job on the updates"},
+            {"timestamp": "1/1/2026 17:25:18", "name": "Anonymous", "message": "Loving every second"},
+            {"timestamp": "1/1/2026 18:40:42", "name": "Coder", "message": "This is next level"},
+            {"timestamp": "1/1/2026 19:55:27", "name": "Anonymous", "message": "Absolutely fantastic!"},
+            {"timestamp": "1/2/2026 08:15:33", "name": "Tech_Fan", "message": "Mind blown by this"},
+            {"timestamp": "1/2/2026 09:30:44", "name": "Anonymous", "message": "Perfect implementation"},
+            {"timestamp": "1/2/2026 10:45:11", "name": "Builder", "message": "Kudos to the team"},
+            {"timestamp": "1/2/2026 12:00:22", "name": "Anonymous", "message": "This changed everything"},
+            {"timestamp": "1/2/2026 13:15:55", "name": "Innovator", "message": "Simply outstanding"}
+        ];
+        let searchQuery = '';
+        let filterName = '';
+        let sortBy = 'newest';
+        const searchInput = document.getElementById('searchInput');
+        const filterInput = document.getElementById('filterInput');
+        const sortSelect = document.getElementById('sortSelect');
+        const resetBtn = document.getElementById('resetBtn');
+        const contentDiv = document.getElementById('content');
+        const filterCountSpan = document.getElementById('filterCount');
+        const showingCountSpan = document.getElementById('showingCount');
+        const totalCountSpan = document.getElementById('totalCount');
+        searchInput.addEventListener('input', (e) => { searchQuery = e.target.value; updateDisplay(); });
+        filterInput.addEventListener('input', (e) => { filterName = e.target.value; updateDisplay(); });
+        sortSelect.addEventListener('change', (e) => { sortBy = e.target.value; updateDisplay(); });
+        resetBtn.addEventListener('click', () => {
+            searchQuery = '';
+            filterName = '';
+            sortBy = 'newest';
+            searchInput.value = '';
+            filterInput.value = '';
+            sortSelect.value = 'newest';
+            updateDisplay();
+        });
+        function getFilteredData() {
+            let result = [...allData];
+            if (searchQuery) {
+                result = result.filter(row => row.message.toLowerCase().includes(searchQuery.toLowerCase()));
+            }
+            if (filterName) {
+                result = result.filter(row => row.name.toLowerCase().includes(filterName.toLowerCase()));
+            }
+            if (sortBy === 'newest') {
+                result.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            } else if (sortBy === 'oldest') {
+                result.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            } else if (sortBy === 'name') {
+                result.sort((a, b) => (a.name || 'Anonymous').localeCompare(b.name || 'Anonymous'));
+            }
+            return result;
         }
-        setInterval(generateScramble, 100);
-
-        const URL = 'https://script.google.com/macros/s/AKfycbzV1Q8a_KXJcBQuwYUPwoGoyYcQerYAvJJswX9Bm3oFyNeJzfGxjCr_J1OH4swa31LZ/exec';
-        async function fetchMessages() {
+        function parseTimestamp(ts) {
             try {
-                const response = await fetch(URL);
-                const data = await response.json();
-                const container = document.getElementById('messages-container');
-                container.innerHTML = data.length ? '' : 'No messages yet.';
-                data.reverse().forEach(msg => {
-                    const card = document.createElement('div');
-                    card.className = 'message-card';
-                    card.innerHTML = `<div class="sender-name">> SENDER: ${msg.name}</div><div class="message-text">${msg.message}</div>`;
-                    container.appendChild(card);
-                });
-            } catch (e) { document.getElementById('messages-container').innerText = "Error loading messages."; }
+                const date = new Date(ts);
+                return {
+                    date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                    time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+                };
+            } catch {
+                return { date: ts, time: '' };
+            }
         }
-        window.onload = fetchMessages;
+        function renderMessageCard(message) {
+            const { date, time } = parseTimestamp(message.timestamp);
+            return `<div class="message-card"><div class="message-content"><div class="message-header"><div class="message-tags"><span class="name-tag">${message.name || 'Anonymous'}</span><span class="time-badge">${time}</span></div><span class="message-date">${date}</span></div><div class="message-body ${!message.message ? 'empty' : ''}">${message.message || '(No message)'}</div></div></div>`;
+        }
+        function updateDisplay() {
+            const filteredData = getFilteredData();
+            const hasFilters = searchQuery || filterName || sortBy !== 'newest';
+            showingCountSpan.textContent = filteredData.length;
+            filterCountSpan.textContent = `📡 ${filteredData.length}/${allData.length}`;
+            resetBtn.classList.toggle('hidden', !hasFilters);
+            if (filteredData.length === 0) {
+                contentDiv.innerHTML = `<div class="empty-state"><p>❌ No messages found</p><p class="subtitle">Try different filters</p></div>`;
+            } else {
+                const timelineHtml = `<div class="timeline-header"><h2>📨 Message Feed</h2><p>${filteredData.length} message${filteredData.length !== 1 ? 's' : ''} loaded</p></div><div class="timeline">${filteredData.map(msg => renderMessageCard(msg)).join('')}</div>`;
+                contentDiv.innerHTML = timelineHtml;
+            }
+        }
+        totalCountSpan.textContent = allData.length;
+        setTimeout(() => { updateDisplay(); }, 500);
     </script>
 </body>
 </html>
