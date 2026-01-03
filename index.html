@@ -34,6 +34,8 @@
         }
         @keyframes glow { 0%, 100% { text-shadow: 0 0 20px #ff00ff, 0 0 40px #a020f0; } 50% { text-shadow: 0 0 30px #ff00ff, 0 0 60px #a020f0, 0 0 80px #7b0dd4; } }
         .hero p { font-size: 1.1rem; color: #00ff88; text-shadow: 0 0 10px #00ff88; }
+        .status-indicator { display: inline-block; width: 10px; height: 10px; background: #00ff88; border-radius: 50%; margin-left: 10px; box-shadow: 0 0 10px #00ff88; animation: pulse 1s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .container { display: flex; min-height: calc(100vh - 200px); }
         .sidebar {
             width: 300px;
@@ -96,6 +98,10 @@
         .timeline-header { margin-bottom: 30px; }
         .timeline-header h2 { font-size: 2rem; color: #ff00ff; text-shadow: 0 0 15px #ff00ff; margin-bottom: 8px; }
         .timeline-header p { font-size: 0.9rem; color: #00ff88; }
+        .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; text-align: center; }
+        .spinner { width: 50px; height: 50px; border: 3px solid #a020f0; border-top-color: #ff00ff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; box-shadow: 0 0 20px #ff00ff; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error { background: rgba(255, 0, 0, 0.1); border: 2px solid #ff0000; border-radius: 8px; padding: 20px; color: #ff6666; text-align: center; }
         .empty-state { text-align: center; padding: 80px 20px; }
         .empty-state p { font-size: 1.2rem; color: #00ff88; margin-bottom: 10px; text-shadow: 0 0 10px #00ff88; }
         .empty-state p.subtitle { font-size: 0.9rem; color: #a020f0; }
@@ -181,8 +187,8 @@
 </head>
 <body>
     <div class="hero">
-        <h1>⚡ APEX ⚡</h1>
-        <p>Anonymous Message Hub - Real-time Feed</p>
+        <h1>⚡ APEX ⚡<span class="status-indicator"></span></h1>
+        <p>Anonymous Message Hub - Live Feed</p>
     </div>
     <div class="container">
         <div class="sidebar">
@@ -216,35 +222,20 @@
             </div>
             <button class="reset-btn hidden" id="resetBtn">🔄 Clear Filters</button>
             <div class="sidebar-info">
-                <p>💡 Use search to find messages by content, or filter by sender name.</p>
+                <p>💡 Use search to find messages by content, or filter by sender name. Auto-refreshing every 2 seconds.</p>
             </div>
         </div>
         <div class="main-content">
             <div id="content">
-                <div class="empty-state">
-                    <p>⏳ Loading messages...</p>
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>⏳ Loading live messages...</p>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        const allData = [
-            {"timestamp": "1/1/2026 10:30:15", "name": "Anonymous", "message": "This is a great platform!"},
-            {"timestamp": "1/1/2026 11:45:22", "name": "Anonymous", "message": "Love the vibe here"},
-            {"timestamp": "1/1/2026 12:15:08", "name": "User123", "message": "Amazing experience so far"},
-            {"timestamp": "1/1/2026 13:20:45", "name": "Anonymous", "message": "Keep up the good work"},
-            {"timestamp": "1/1/2026 14:30:12", "name": "Apex_User", "message": "This is incredible!"},
-            {"timestamp": "1/1/2026 15:45:33", "name": "Anonymous", "message": "Best platform ever"},
-            {"timestamp": "1/1/2026 16:10:50", "name": "Developer", "message": "Great job on the updates"},
-            {"timestamp": "1/1/2026 17:25:18", "name": "Anonymous", "message": "Loving every second"},
-            {"timestamp": "1/1/2026 18:40:42", "name": "Coder", "message": "This is next level"},
-            {"timestamp": "1/1/2026 19:55:27", "name": "Anonymous", "message": "Absolutely fantastic!"},
-            {"timestamp": "1/2/2026 08:15:33", "name": "Tech_Fan", "message": "Mind blown by this"},
-            {"timestamp": "1/2/2026 09:30:44", "name": "Anonymous", "message": "Perfect implementation"},
-            {"timestamp": "1/2/2026 10:45:11", "name": "Builder", "message": "Kudos to the team"},
-            {"timestamp": "1/2/2026 12:00:22", "name": "Anonymous", "message": "This changed everything"},
-            {"timestamp": "1/2/2026 13:15:55", "name": "Innovator", "message": "Simply outstanding"}
-        ];
+        let allData = [];
         let searchQuery = '';
         let filterName = '';
         let sortBy = 'newest';
@@ -256,6 +247,40 @@
         const filterCountSpan = document.getElementById('filterCount');
         const showingCountSpan = document.getElementById('showingCount');
         const totalCountSpan = document.getElementById('totalCount');
+        
+        // Fetch data from Google Sheets
+        async function fetchSpreadsheetData() {
+            try {
+                const sheetId = '1CFxZVMIMP65Hn5dt2kuoI4o4uUF19utMtDiB55dxC0g';
+                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch spreadsheet');
+                
+                const csv = await response.text();
+                const rows = csv.trim().split('\n');
+                
+                // Parse CSV data (assuming columns: Sender, Message, Timestamp)
+                allData = rows.slice(1).map(row => {
+                    const parts = row.split(',');
+                    const sender = parts[0] ? parts[0].trim() : 'Anonymous';
+                    const message = parts[1] ? parts[1].trim() : '';
+                    const timestamp = parts[2] ? parts[2].trim() : new Date().toLocaleString();
+                    
+                    return {
+                        name: sender,
+                        message: message,
+                        timestamp: timestamp
+                    };
+                }).filter(row => row.name || row.message);
+                
+                totalCountSpan.textContent = allData.length;
+                updateDisplay();
+            } catch (error) {
+                contentDiv.innerHTML = `<div class="error">⚠️ Error loading spreadsheet: ${error.message}</div>`;
+            }
+        }
+        
         searchInput.addEventListener('input', (e) => { searchQuery = e.target.value; updateDisplay(); });
         filterInput.addEventListener('input', (e) => { filterName = e.target.value; updateDisplay(); });
         sortSelect.addEventListener('change', (e) => { sortBy = e.target.value; updateDisplay(); });
@@ -268,6 +293,7 @@
             sortSelect.value = 'newest';
             updateDisplay();
         });
+        
         function getFilteredData() {
             let result = [...allData];
             if (searchQuery) {
@@ -285,6 +311,7 @@
             }
             return result;
         }
+        
         function parseTimestamp(ts) {
             try {
                 const date = new Date(ts);
@@ -296,10 +323,12 @@
                 return { date: ts, time: '' };
             }
         }
+        
         function renderMessageCard(message) {
             const { date, time } = parseTimestamp(message.timestamp);
             return `<div class="message-card"><div class="message-content"><div class="message-header"><div class="message-tags"><span class="name-tag">${message.name || 'Anonymous'}</span><span class="time-badge">${time}</span></div><span class="message-date">${date}</span></div><div class="message-body ${!message.message ? 'empty' : ''}">${message.message || '(No message)'}</div></div></div>`;
         }
+        
         function updateDisplay() {
             const filteredData = getFilteredData();
             const hasFilters = searchQuery || filterName || sortBy !== 'newest';
@@ -313,8 +342,12 @@
                 contentDiv.innerHTML = timelineHtml;
             }
         }
-        totalCountSpan.textContent = allData.length;
-        setTimeout(() => { updateDisplay(); }, 500);
+        
+        // Load data on page load
+        fetchSpreadsheetData();
+        
+        // Refresh data every 2 seconds
+        setInterval(fetchSpreadsheetData, 2000);
     </script>
 </body>
 </html>
