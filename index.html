@@ -3,11 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spreadsheet Data Visualizer</title>
+    <title>Apex Anonymous Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Courier+Prime:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-dark: #0a0a0c;
+            --bg-card: #141418;
+            --bg-sidebar: #0f0f12;
+            --neon-purple: #bc13fe;
+            --neon-purple-glow: rgba(188, 19, 254, 0.3);
+            --text-primary: #e0e0e6;
+            --text-secondary: #9494a3;
+            --border-color: #2a2a32;
+            --accent-glow: 0 0 15px rgba(188, 19, 254, 0.4);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -16,38 +28,39 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: #faf9f7;
-            color: #262420;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
             line-height: 1.6;
         }
 
         h1, h2, h3, h4, h5, h6 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .font-mono {
-            font-family: 'Courier Prime', monospace;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         /* Hero Section */
         .hero {
             position: relative;
-            height: 320px;
-            background: linear-gradient(135deg, #faf9f7 0%, #a8bba8 50%, #0d5f5f 100%);
+            height: 280px;
+            background: linear-gradient(180deg, #000000 0%, var(--bg-dark) 100%);
+            border-bottom: 1px solid var(--border-color);
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            color: white;
         }
 
         .hero::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: rgba(0, 0, 0, 0.2);
+            background: radial-gradient(circle at center, rgba(188, 19, 254, 0.15) 0%, transparent 70%);
             z-index: 1;
         }
 
@@ -58,89 +71,98 @@
         }
 
         .hero h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             margin-bottom: 10px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            color: var(--neon-purple);
+            text-shadow: 0 0 20px var(--neon-purple-glow);
         }
 
         .hero p {
-            font-size: 1.1rem;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+            color: var(--text-secondary);
             max-width: 600px;
             margin: 0 auto;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         /* Main container */
         .container {
             display: flex;
-            min-height: calc(100vh - 320px);
+            min-height: calc(100vh - 280px);
         }
 
         /* Sidebar */
         .sidebar {
-            width: 280px;
-            background-color: #ffffff;
-            border-right: 1px solid #e8e6e2;
-            padding: 24px;
+            width: 300px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 32px 24px;
             overflow-y: auto;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .sidebar h2 {
-            font-size: 1.1rem;
-            margin-bottom: 5px;
-            color: #262420;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
         }
 
         .sidebar-subtitle {
-            font-size: 0.75rem;
-            color: #8b8680;
-            margin-bottom: 24px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .form-group label {
             display: block;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            color: #262420;
-            margin-bottom: 8px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         input[type="text"],
         select {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #e8e6e2;
-            border-radius: 8px;
+            padding: 12px 16px;
+            background-color: #050507;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             font-size: 0.875rem;
+            color: var(--text-primary);
             font-family: inherit;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         input[type="text"]:focus,
         select:focus {
             outline: none;
-            border-color: #0d5f5f;
-            box-shadow: 0 0 0 3px rgba(13, 95, 95, 0.1);
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 10px var(--neon-purple-glow);
         }
 
         .stats-box {
-            background-color: rgba(13, 95, 95, 0.05);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 24px;
+            background-color: rgba(188, 19, 254, 0.05);
+            border: 1px solid rgba(188, 19, 254, 0.1);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 32px;
         }
 
         .stat-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.875rem;
-            margin-bottom: 8px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
         }
 
         .stat-row:last-child {
@@ -148,34 +170,38 @@
         }
 
         .stat-label {
-            color: #8b8680;
+            color: var(--text-secondary);
         }
 
         .stat-value {
-            font-weight: 600;
-            color: #0d5f5f;
+            font-weight: 700;
+            color: var(--neon-purple);
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .reset-btn {
             width: 100%;
-            padding: 10px 12px;
-            background-color: #ffffff;
-            border: 1px solid #e8e6e2;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #262420;
+            padding: 12px;
+            background-color: transparent;
+            border: 1px solid var(--neon-purple);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--neon-purple);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .reset-btn:hover {
-            background-color: #f5f4f2;
-            border-color: #d4d0ca;
+            background-color: var(--neon-purple);
+            color: white;
+            box-shadow: 0 0 15px var(--neon-purple-glow);
         }
 
         .reset-btn.hidden {
@@ -183,38 +209,42 @@
         }
 
         .sidebar-info {
-            border-top: 1px solid #e8e6e2;
-            padding-top: 16px;
-            font-size: 0.75rem;
-            color: #8b8680;
-            line-height: 1.6;
+            border-top: 1px solid var(--border-color);
+            padding-top: 24px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
         }
 
         .sidebar-info strong {
-            color: #262420;
+            color: var(--text-primary);
         }
 
         /* Main content */
         .main-content {
             flex: 1;
-            padding: 40px;
+            padding: 48px;
             overflow-y: auto;
-            background-color: #faf9f7;
+            background-color: var(--bg-dark);
         }
 
         .timeline-header {
-            margin-bottom: 32px;
+            margin-bottom: 40px;
+            border-left: 4px solid var(--neon-purple);
+            padding-left: 20px;
         }
 
         .timeline-header h2 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             margin-bottom: 8px;
-            color: #262420;
+            color: var(--text-primary);
         }
 
         .timeline-header p {
-            font-size: 0.875rem;
-            color: #8b8680;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         /* Loading state */
@@ -223,18 +253,19 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
             text-align: center;
         }
 
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(13, 95, 95, 0.2);
-            border-top-color: #0d5f5f;
+            width: 50px;
+            height: 50px;
+            border: 2px solid rgba(188, 19, 254, 0.1);
+            border-top-color: var(--neon-purple);
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 16px;
+            animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            margin-bottom: 24px;
+            box-shadow: 0 0 15px var(--neon-purple-glow);
         }
 
         @keyframes spin {
@@ -243,46 +274,48 @@
 
         /* Error state */
         .error {
-            background-color: rgba(220, 38, 38, 0.1);
-            border: 1px solid rgba(220, 38, 38, 0.3);
-            border-radius: 8px;
-            padding: 24px;
+            background-color: rgba(220, 38, 38, 0.05);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            border-radius: 4px;
+            padding: 32px;
             display: flex;
-            gap: 16px;
+            gap: 20px;
         }
 
         .error-icon {
             color: #dc2626;
             flex-shrink: 0;
-            font-weight: bold;
+            font-size: 1.5rem;
         }
 
         .error-content h3 {
             color: #dc2626;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-size: 1rem;
         }
 
         .error-content p {
             font-size: 0.875rem;
-            color: rgba(220, 38, 38, 0.8);
+            color: rgba(220, 38, 38, 0.7);
         }
 
         /* Empty state */
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
         }
 
         .empty-state p {
-            font-size: 1.1rem;
-            color: #8b8680;
-            margin-bottom: 8px;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
         }
 
         .empty-state p.subtitle {
-            font-size: 0.875rem;
-            color: #a8a29d;
+            font-size: 0.8rem;
+            color: #5a5a6e;
         }
 
         /* Timeline */
@@ -292,19 +325,19 @@
 
         .message-card {
             position: relative;
-            padding-left: 32px;
-            padding-bottom: 32px;
-            animation: slideIn 0.5s ease-out;
+            padding-left: 40px;
+            padding-bottom: 40px;
+            animation: slideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateX(-10px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateX(0);
             }
         }
 
@@ -312,11 +345,11 @@
         .message-card::before {
             content: '';
             position: absolute;
-            left: 8px;
-            top: 8px;
+            left: 9px;
+            top: 12px;
             bottom: 0;
             width: 2px;
-            background: linear-gradient(to bottom, #0d5f5f, rgba(13, 95, 95, 0.2));
+            background: linear-gradient(to bottom, var(--neon-purple), transparent);
         }
 
         /* Timeline dot */
@@ -327,179 +360,177 @@
             top: 8px;
             width: 20px;
             height: 20px;
-            background-color: #ffffff;
-            border: 2px solid #0d5f5f;
+            background-color: var(--bg-dark);
+            border: 2px solid var(--neon-purple);
             border-radius: 50%;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px var(--neon-purple-glow);
+            z-index: 2;
         }
 
         .message-content {
-            background-color: #ffffff;
-            border: 1px solid #e8e6e2;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            transition: all 0.2s ease;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 24px;
+            transition: all 0.3s ease;
         }
 
         .message-card:hover .message-content {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.1);
             transform: translateY(-2px);
         }
 
         .message-header {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 16px;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             justify-content: space-between;
         }
 
         .message-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 12px;
             align-items: center;
         }
 
         .name-tag {
             display: inline-block;
-            padding: 6px 12px;
-            background-color: rgba(13, 95, 95, 0.1);
-            color: #0d5f5f;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 600;
+            padding: 4px 12px;
+            background-color: rgba(188, 19, 254, 0.1);
+            color: var(--neon-purple);
+            border: 1px solid rgba(188, 19, 254, 0.2);
+            border-radius: 2px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
         }
 
         .time-badge {
             display: inline-block;
             padding: 4px 10px;
-            background-color: #0d5f5f;
-            color: #ffffff;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-family: 'Courier Prime', monospace;
+            background-color: #1a1a20;
+            color: var(--text-secondary);
+            border-radius: 2px;
+            font-size: 0.7rem;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .message-date {
             font-size: 0.75rem;
-            color: #8b8680;
-            font-family: 'Courier Prime', monospace;
+            color: #5a5a6e;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .message-body {
-            font-size: 0.875rem;
-            color: #262420;
-            line-height: 1.6;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            white-space: pre-wrap;
             word-break: break-word;
         }
 
         .message-body.empty {
-            font-size: 0.75rem;
-            color: #8b8680;
+            color: #5a5a6e;
             font-style: italic;
         }
 
-        /* Responsive */
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a32;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-purple);
+        }
+
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
             }
-
             .sidebar {
                 width: 100%;
                 border-right: none;
-                border-bottom: 1px solid #e8e6e2;
-                max-height: auto;
+                border-bottom: 1px solid var(--border-color);
             }
-
-            .main-content {
-                padding: 24px;
-            }
-
             .hero h1 {
-                font-size: 1.75rem;
-            }
-
-            .hero p {
-                font-size: 0.95rem;
-            }
-
-            .message-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .message-date {
-                align-self: flex-start;
+                font-size: 2rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Hero Section -->
     <div class="hero">
         <div class="hero-content">
-            <h1>Spreadsheet Visualizer</h1>
-            <p>Explore and rearrange your data with interactive filtering and sorting</p>
+            <h1>Apex Anonymous Dashboard</h1>
+            <p>Secure Data Stream • Real-time Insights</p>
         </div>
     </div>
 
-    <!-- Main Container -->
     <div class="container">
-        <!-- Sidebar -->
         <div class="sidebar">
-            <h2>Explore Data</h2>
-            <p class="sidebar-subtitle" id="filterCount">Loading...</p>
+            <h2>System Filters</h2>
+            <p class="sidebar-subtitle">Configure Viewport</p>
 
             <div class="form-group">
-                <label for="searchInput">Search Messages</label>
-                <input type="text" id="searchInput" placeholder="Find by content...">
+                <label for="searchInput">Search Logs</label>
+                <input type="text" id="searchInput" placeholder="Enter keywords...">
             </div>
 
             <div class="form-group">
-                <label for="filterInput">Filter by Name</label>
-                <input type="text" id="filterInput" placeholder="Enter name...">
+                <label for="filterInput">Filter by Identity</label>
+                <input type="text" id="filterInput" placeholder="Username...">
             </div>
 
             <div class="form-group">
-                <label for="sortSelect">Sort By</label>
+                <label for="sortSelect">Sequence Order</label>
                 <select id="sortSelect">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="name">By Name (A-Z)</option>
+                    <option value="newest">Chronological (Newest)</option>
+                    <option value="oldest">Chronological (Oldest)</option>
+                    <option value="name">Alphabetical (Identity)</option>
                 </select>
             </div>
 
             <div class="stats-box">
                 <div class="stat-row">
-                    <span class="stat-label">Showing:</span>
-                    <span class="stat-value" id="showingCount">0</span>
+                    <span class="stat-label">Total Nodes</span>
+                    <span class="stat-value" id="totalCount">0</span>
                 </div>
                 <div class="stat-row">
-                    <span class="stat-label">Total:</span>
-                    <span class="stat-value" id="totalCount">0</span>
+                    <span class="stat-label">Active View</span>
+                    <span class="stat-value" id="showingCount">0</span>
                 </div>
             </div>
 
-            <button class="reset-btn hidden" id="resetBtn">
-                <span>✕</span> Clear Filters
+            <button id="resetBtn" class="reset-btn hidden">
+                Reset System
             </button>
 
             <div class="sidebar-info">
-                <p><strong>Tip:</strong> Use the search box to find messages by content, or filter by sender name.</p>
-                <p style="margin-top: 12px;">Messages are displayed in a timeline format for easy browsing.</p>
+                <p id="filterCount">Initializing system...</p>
+                <p style="margin-top: 12px;">
+                    <strong>Apex Dashboard</strong> v2.0.4<br>
+                    Secure encrypted connection active.
+                </p>
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="main-content">
             <div id="content">
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p>Loading spreadsheet data...</p>
+                    <p>Synchronizing with data stream...</p>
                 </div>
             </div>
         </div>
@@ -577,7 +608,7 @@
                     <div class="error">
                         <div class="error-icon">⚠</div>
                         <div class="error-content">
-                            <h3>Error Loading Data</h3>
+                            <h3>System Error</h3>
                             <p>${error.message}</p>
                         </div>
                     </div>
@@ -657,7 +688,7 @@
 
             // Update counts
             showingCountSpan.textContent = filteredData.length;
-            filterCountSpan.textContent = `Filter: ${filteredData.length} of ${allData.length} messages`;
+            filterCountSpan.textContent = `Status: ${filteredData.length} of ${allData.length} records active`;
 
             // Update reset button visibility
             resetBtn.classList.toggle('hidden', !hasFilters);
@@ -666,15 +697,15 @@
             if (filteredData.length === 0) {
                 contentDiv.innerHTML = `
                     <div class="empty-state">
-                        <p>No messages found</p>
-                        <p class="subtitle">Try adjusting your filters or search query</p>
+                        <p>No records found in current viewport</p>
+                        <p class="subtitle">Adjust system filters to expand search</p>
                     </div>
                 `;
             } else {
                 const timelineHtml = `
                     <div class="timeline-header">
-                        <h2>Message Timeline</h2>
-                        <p>${filteredData.length} message${filteredData.length !== 1 ? 's' : ''} displayed</p>
+                        <h2>Data Stream Timeline</h2>
+                        <p>${filteredData.length} record${filteredData.length !== 1 ? 's' : ''} synchronized</p>
                     </div>
                     <div class="timeline">
                         ${filteredData.map(msg => renderMessageCard(msg)).join('')}
