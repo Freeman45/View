@@ -248,36 +248,29 @@
         const showingCountSpan = document.getElementById('showingCount');
         const totalCountSpan = document.getElementById('totalCount');
         
-        // Fetch data from Google Sheets
+        // Fetch data from Google Apps Script Web App
         async function fetchSpreadsheetData() {
             try {
-                const sheetId = '1CFxZVMIMP65Hn5dt2kuoI4o4uUF19utMtDiB55dxC0g';
-                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+                // Using the URL from the working example
+                const URL = 'https://script.google.com/macros/s/AKfycbz2LpsxzDvZnwz7RcanzDcYIDSGqx225QcJSuZXuAcigk9mYuyAGyzVcN6LuSUk6PyJ/exec';
                 
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch spreadsheet');
+                // Fetching data via GET request to the GAS Web App
+                const response = await fetch(URL);
+                if (!response.ok) throw new Error('Failed to fetch data');
                 
-                const csv = await response.text();
-                const rows = csv.trim().split('\n');
+                const data = await response.json();
                 
-                // Parse CSV data (assuming columns: Sender, Message, Timestamp)
-                allData = rows.slice(1).map(row => {
-                    const parts = row.split(',');
-                    const sender = parts[0] ? parts[0].trim() : 'Anonymous';
-                    const message = parts[1] ? parts[1].trim() : '';
-                    const timestamp = parts[2] ? parts[2].trim() : new Date().toLocaleString();
-                    
-                    return {
-                        name: sender,
-                        message: message,
-                        timestamp: timestamp
-                    };
-                }).filter(row => row.name || row.message);
+                // Assuming the GAS script returns an array of objects with 'name', 'message', and 'timestamp'
+                allData = data.map(item => ({
+                    name: item.name || 'Anonymous',
+                    message: item.message || '',
+                    timestamp: item.timestamp || new Date().toLocaleString()
+                })).filter(row => row.name || row.message);
                 
                 totalCountSpan.textContent = allData.length;
                 updateDisplay();
             } catch (error) {
-                contentDiv.innerHTML = `<div class="error">⚠️ Error loading spreadsheet: ${error.message}</div>`;
+                contentDiv.innerHTML = `<div class="error">⚠️ Error loading data: ${error.message}</div>`;
             }
         }
         
@@ -315,6 +308,7 @@
         function parseTimestamp(ts) {
             try {
                 const date = new Date(ts);
+                if (isNaN(date.getTime())) throw new Error('Invalid date');
                 return {
                     date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
                     time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
